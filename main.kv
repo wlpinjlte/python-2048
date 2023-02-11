@@ -1,7 +1,14 @@
 <Template>
     mainGrid:mainGrid
 
+    canvas.before:
+        Color:
+            rgba: (1, 1, 1, 1)
+        Rectangle:
+            size: 400,400
+            source:'./assets/image/background.PNG'
+            pos: self.pos
     GridLayout:
         cols: 1
         id: mainGrid
-        size: root.width, root.height
+        size: 400,400

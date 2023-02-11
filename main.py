@@ -7,6 +7,13 @@ from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.properties import ObjectProperty
 from kivy.core.window import Window
+from kivy.uix.image import Image
+from kivy.config import Config
+from kivy.animation import Animation
+Config.set('graphics', 'width', '400')
+Config.set('graphics', 'height', '400')
+Config.set('graphics', 'resizable', '0')
+Config.write()
 
 # Game BackEnd
 class Game:
@@ -14,6 +21,7 @@ class Game:
         self.board=[[0 for i in range(4)]for j in range(4)]
         self.board[1][2]=2
         self.board[2][1]=2
+        self.isMarge=[[False for j in range(4)]for i in range(4)]
 
     def getBoard(self):
         return self.board
@@ -33,6 +41,9 @@ class Game:
 
     def endGame(self):
         pass
+
+    def getIsMarge(self):
+        return self.isMarge
 
     def move(self, direction):
         isMarge = [[False for i in range(len(self.board[0]))] for j in range(len(self.board))]
@@ -127,9 +138,37 @@ class Game:
                         isMarge[positonToPlaceIteam + 1][y] = True
                     else:
                         positonToPlaceIteam -= 1
+        self.isMarge=isMarge
 
 
 # Game FrontEnd(Gui)
+def setImage(image,vaule,isAnimation):
+    pathToImageToSet=None
+    if(vaule>128 or vaule==0):
+        pathToImageToSet='./assets/image/empty.PNG'
+    elif(vaule==2):
+        pathToImageToSet = './assets/image/2.PNG'
+    elif (vaule == 4):
+        pathToImageToSet = './assets/image/4.PNG'
+    elif (vaule == 8):
+        pathToImageToSet = './assets/image/8.PNG'
+    elif (vaule == 16):
+        pathToImageToSet = './assets/image/16.PNG'
+    elif (vaule == 32):
+        pathToImageToSet = './assets/image/32.PNG'
+    elif (vaule == 64):
+        pathToImageToSet = './assets/image/64.PNG'
+    elif (vaule == 128):
+        pathToImageToSet = './assets/image/128.PNG'
+    if(image==None):
+        return Image(source=pathToImageToSet,size_hint=(100,100))
+    elif(image.source==pathToImageToSet):
+        return
+    image.source=pathToImageToSet
+    if(isAnimation):
+        animation=Animation(size_hint=(110,110),size=(110,110),duration=0.1)
+        animation+=Animation(size_hint=(100,100),size=(100,100),duration=0.2)
+        animation.start(image)
 
 class Template(Widget):
     mainGrid = ObjectProperty(None)
@@ -147,7 +186,7 @@ class Template(Widget):
         self.fields = [[None for i in range(len(board[0]))] for j in range(len(board))]
         for i in range(len(board)):
             for j in range(len(board[i])):
-                image = Label(text=str(board[i][j]))
+                image = setImage(None,board[i][j],False)
                 self.guiBoard.add_widget(image)
                 self.fields[i][j] = image
         self.mainGrid.add_widget(self.guiBoard)
@@ -155,7 +194,7 @@ class Template(Widget):
         self.board=self.game.getBoard()
         for i in range(len(self.board)):
             for j in range(len(self.board[i])):
-                self.fields[i][j].text=str(self.board[i][j])
+                setImage(self.fields[i][j],self.board[i][j],self.game.getIsMarge()[i][j])
 
     def _keyboard_closed(self):
         self._keyboard.unbind(on_key_down=self._on_keyboard_down)
