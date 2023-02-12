@@ -1,6 +1,6 @@
 <Template>
     mainGrid:mainGrid
-
+    gameOver:gameOver
     canvas.before:
         Color:
             rgba: (1, 1, 1, 1)
@@ -12,3 +12,9 @@
         cols: 1
         id: mainGrid
         size: 400,400
+    Label:
+        text: ""
+        id: gameOver
+        pos: (150,150)
+        font_size: 45
+        markup: True

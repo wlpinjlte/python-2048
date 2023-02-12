@@ -10,6 +10,9 @@ from kivy.core.window import Window
 from kivy.uix.image import Image
 from kivy.config import Config
 from kivy.animation import Animation
+from kivy.graphics import Color
+from kivy.graphics import Canvas
+from kivy.graphics import Rectangle
 Config.set('graphics', 'width', '400')
 Config.set('graphics', 'height', '400')
 Config.set('graphics', 'resizable', '0')
@@ -40,8 +43,19 @@ class Game:
         self.board[freeField[fieldToChoose][0]][freeField[fieldToChoose][1]] = 2
 
     def endGame(self):
-        pass
-
+        for i in range(len(self.board)):
+            for j in range(len(self.board)):
+                if self.board[i][j]==0:
+                    return False
+        for i in range(len(self.board)-1):
+            for j in range(len(self.board)-1):
+                if self.board[i][j]==self.board[i+1][j] or self.board[i][j]==self.board[i][j+1]:
+                    return False
+        for i in range(len(self.board)-1,0,-1):
+            for j in range(len(self.board)-1,0,-1):
+                if self.board[i][j]==self.board[i-1][j] or self.board[i][j]==self.board[i][j-1]:
+                    return False
+        return True
     def getIsMarge(self):
         return self.isMarge
 
@@ -172,12 +186,13 @@ def setImage(image,vaule,isAnimation):
 
 class Template(Widget):
     mainGrid = ObjectProperty(None)
-
+    gameOver = ObjectProperty(None)
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
         self.game=Game()
         board = self.game.getBoard()
-
+        self.flag=True
         self._keyboard = Window.request_keyboard(
             self._keyboard_closed, self, 'text')
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
@@ -204,6 +219,15 @@ class Template(Widget):
         self.game.move(keycode[1])
         self.game.updateFiledToFill()
         self.updateMap()
+        print(self.game.endGame())
+        if(self.game.endGame() and self.flag==True):
+            self.flag=False
+            with self.canvas.after:
+                Color(1,1,1,0.3,mode='rgba')
+                Rectangle(size= (400, 400),pos=self.pos)
+            self.gameOver.text="[b][color=7e746a]GameOver[/color][/b]"
+
+
         return True
 
 
